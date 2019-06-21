@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace Tavisca.Bootcamp.LanguageBasics.Exercise1
 {
@@ -40,8 +41,102 @@ namespace Tavisca.Bootcamp.LanguageBasics.Exercise1
 
         public static int[] SelectMeals(int[] protein, int[] carbs, int[] fat, string[] dietPlans)
         {
-            // Add your code here.
-            throw new NotImplementedException();
+            int n = protein.Length;
+            int[] calories = new int[n];
+
+            for (int i = 0; i < n; i++) {
+                calories[i] = (protein[i] + carbs[i]) * 5 + fat[i] * 9;
+            }
+            int[] meal = new int[dietPlans.Length];
+
+            for (int i = 0; i < dietPlans.Length; i++) {
+                string plan = dietPlans[i];
+
+                if (plan.Length == 0) {
+                    meal[i] = 0;
+                    continue;
+                }
+
+                List<int> indices = new List<int>();
+                List<int> tempIndices = new List<int>();
+
+                for (int j = 0; j < n; j++) indices.Add(j);
+
+                int max, min;
+                foreach (char ch in plan) {
+                    switch(ch) {
+                        case 'P':
+                            max = FindMax(protein, indices);
+                            indices = FindAllIndices(protein, indices, max);
+                            break;
+                        case 'p':
+                            min = FindMin(protein, indices);
+                            indices = FindAllIndices(protein, indices, min);
+                            break;
+                        case 'C':
+                            max = FindMax(carbs, indices);
+                            indices = FindAllIndices(carbs, indices, max);
+                            break;
+                        case 'c':
+                            min = FindMin(carbs, indices);
+                            indices = FindAllIndices(carbs, indices, min);
+                            break;
+                        case 'F':
+                            max = FindMax(fat, indices);
+                            indices = FindAllIndices(fat, indices, max);
+                            break;
+                        case 'f':
+                            min = FindMin(fat, indices);
+                            indices = FindAllIndices(fat, indices, min);
+                            break;
+                        case 'T':
+                            max = FindMax(calories, indices);
+                            indices = FindAllIndices(calories, indices, max);
+                            break;
+                        case 't':
+                            min = FindMin(calories, indices);
+                            indices = FindAllIndices(calories, indices, min);
+                            break;
+                    }
+                }
+
+                meal[i] = indices[0];
+            }
+
+            return meal;
+        }
+
+        public static List<int> FindAllIndices(int[] arr, List<int> indices_, int elem) {
+            List<int> indices = new List<int>();
+
+            foreach (int i in indices_) {
+                if (arr[i] == elem) indices.Add(i);
+            }
+
+            return indices;
+        }
+
+        public static int FindMax(int[] arr, List<int> indices) {
+            if (indices.Count == 1) return arr[indices[0]];
+
+            int max = arr[indices[0]];
+
+            for (int i = 1; i < indices.Count; i++) {
+                if (arr[indices[i]] > max) max = arr[indices[i]];
+            }
+
+            return max;
+        }
+        public static int FindMin(int[] arr, List<int> indices) {
+            if (indices.Count == 1) return arr[indices[0]];
+
+            int min = arr[indices[0]];
+
+            for (int i = 1; i < indices.Count; i++) {
+                if (arr[indices[i]] < min) min = arr[indices[i]];
+            }
+
+            return min;
         }
     }
 }
