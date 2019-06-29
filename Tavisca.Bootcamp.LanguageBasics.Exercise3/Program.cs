@@ -44,99 +44,87 @@ namespace Tavisca.Bootcamp.LanguageBasics.Exercise1
             int n = protein.Length;
             int[] calories = new int[n];
 
+            // Generate the Calories array
             for (int i = 0; i < n; i++) {
                 calories[i] = (protein[i] + carbs[i]) * 5 + fat[i] * 9;
             }
+
+            // Array to hold the meal index for each diet plan
             int[] meal = new int[dietPlans.Length];
 
             for (int i = 0; i < dietPlans.Length; i++) {
                 string plan = dietPlans[i];
-
+                
+                // Default meal for no diet plan is meal at index 0
                 if (plan.Length == 0) {
                     meal[i] = 0;
                     continue;
                 }
 
-                List<int> indices = new List<int>();
-                List<int> tempIndices = new List<int>();
+                int[] indicesOfPossibleMeals = new int[n];
 
-                for (int j = 0; j < n; j++) indices.Add(j);
+                // At first, meals at all indices are available
+                for (int j = 0; j < n; j++) indicesOfPossibleMeals[j] = j;
 
                 int max, min;
                 foreach (char ch in plan) {
+                    // Capital letter implies the meal should contain Max of it
+                    // Small letter implies the meal should contain Min of it
                     switch(ch) {
                         case 'P':
-                            max = FindMax(protein, indices);
-                            indices = FindAllIndices(protein, indices, max);
+                            max = FindMaxFromParticularIndices(protein, indicesOfPossibleMeals);
+                            indicesOfPossibleMeals = GetIndicesOfPossibleMeals(protein, indicesOfPossibleMeals, max);
                             break;
                         case 'p':
-                            min = FindMin(protein, indices);
-                            indices = FindAllIndices(protein, indices, min);
+                            min = FindMinFromParticularIndices(protein, indicesOfPossibleMeals);
+                            indicesOfPossibleMeals = GetIndicesOfPossibleMeals(protein, indicesOfPossibleMeals, min);
                             break;
                         case 'C':
-                            max = FindMax(carbs, indices);
-                            indices = FindAllIndices(carbs, indices, max);
+                            max = FindMaxFromParticularIndices(carbs, indicesOfPossibleMeals);
+                            indicesOfPossibleMeals = GetIndicesOfPossibleMeals(carbs, indicesOfPossibleMeals, max);
                             break;
                         case 'c':
-                            min = FindMin(carbs, indices);
-                            indices = FindAllIndices(carbs, indices, min);
+                            min = FindMinFromParticularIndices(carbs, indicesOfPossibleMeals);
+                            indicesOfPossibleMeals = GetIndicesOfPossibleMeals(carbs, indicesOfPossibleMeals, min);
                             break;
                         case 'F':
-                            max = FindMax(fat, indices);
-                            indices = FindAllIndices(fat, indices, max);
+                            max = FindMaxFromParticularIndices(fat, indicesOfPossibleMeals);
+                            indicesOfPossibleMeals = GetIndicesOfPossibleMeals(fat, indicesOfPossibleMeals, max);
                             break;
                         case 'f':
-                            min = FindMin(fat, indices);
-                            indices = FindAllIndices(fat, indices, min);
+                            min = FindMinFromParticularIndices(fat, indicesOfPossibleMeals);
+                            indicesOfPossibleMeals = GetIndicesOfPossibleMeals(fat, indicesOfPossibleMeals, min);
                             break;
                         case 'T':
-                            max = FindMax(calories, indices);
-                            indices = FindAllIndices(calories, indices, max);
+                            max = FindMaxFromParticularIndices(calories, indicesOfPossibleMeals);
+                            indicesOfPossibleMeals = GetIndicesOfPossibleMeals(calories, indicesOfPossibleMeals, max);
                             break;
                         case 't':
-                            min = FindMin(calories, indices);
-                            indices = FindAllIndices(calories, indices, min);
+                            min = FindMinFromParticularIndices(calories, indicesOfPossibleMeals);
+                            indicesOfPossibleMeals = GetIndicesOfPossibleMeals(calories, indicesOfPossibleMeals, min);
                             break;
                     }
                 }
 
-                meal[i] = indices[0];
+                // First index of possible meal is chosen
+                meal[i] = indicesOfPossibleMeals[0];
             }
 
             return meal;
         }
 
-        public static List<int> FindAllIndices(int[] arr, List<int> indices_, int elem) {
-            List<int> indices = new List<int>();
-
-            foreach (int i in indices_) {
-                if (arr[i] == elem) indices.Add(i);
-            }
-
-            return indices;
+        public static int[] GetIndicesOfPossibleMeals(int[] arr, int[] indices_, int elem) {
+            return indices_.Where(i => arr[i] == elem).ToArray();
         }
 
-        public static int FindMax(int[] arr, List<int> indices) {
-            if (indices.Count == 1) return arr[indices[0]];
-
-            int max = arr[indices[0]];
-
-            for (int i = 1; i < indices.Count; i++) {
-                if (arr[indices[i]] > max) max = arr[indices[i]];
-            }
-
-            return max;
+        // Indices arr specify what values to choose from arr.
+        // And return Max value from that sub-array 
+        // Similar approach for FindMinFromParticularIndices()
+        public static int FindMaxFromParticularIndices(int[] arr, int[] indices) {
+            return indices.Select(index => arr[index]).Max();
         }
-        public static int FindMin(int[] arr, List<int> indices) {
-            if (indices.Count == 1) return arr[indices[0]];
-
-            int min = arr[indices[0]];
-
-            for (int i = 1; i < indices.Count; i++) {
-                if (arr[indices[i]] < min) min = arr[indices[i]];
-            }
-
-            return min;
+        public static int FindMinFromParticularIndices(int[] arr, int[] indices) {
+            return indices.Select(index => arr[index]).Min();
         }
     }
 }
